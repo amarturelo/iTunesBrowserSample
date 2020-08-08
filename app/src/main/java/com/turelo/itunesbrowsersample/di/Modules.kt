@@ -1,6 +1,8 @@
 package com.turelo.itunesbrowsersample.di
 
+import androidx.room.Room
 import com.turelo.itunesbrowsersample.AppExecutors
+import com.turelo.itunesbrowsersample.data.db.ITunesDatabase
 import com.turelo.itunesbrowsersample.ui.browser.BrowserViewModel
 import com.turelo.itunesbrowsersample.ui.details.DetailsViewModel
 import io.reactivex.schedulers.Schedulers
@@ -19,6 +21,17 @@ val viewModelModule = module {
             application = get(),
             subscribeOnSchedule = Schedulers.from(get<AppExecutors>().networkIO())
         )
+    }
+}
+
+val dbModule = module {
+    single {
+        Room.databaseBuilder(get(), ITunesDatabase::class.java, "iTunes_database")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+    single {
+        get<ITunesDatabase>().songDao()
     }
 }
 
