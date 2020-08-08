@@ -1,7 +1,11 @@
 package com.turelo.itunesbrowsersample.ui.details
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
+import io.reactivex.Scheduler
 
-class DetailsViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+class DetailsViewModel(
+    application: Application,
+    private val subscribeOnSchedule: Scheduler
+) : BaseViewModel(application) {
 }
