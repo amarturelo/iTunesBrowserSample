@@ -1,32 +1,25 @@
 package com.turelo.itunesbrowsersample.ui.details
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.turelo.itunesbrowsersample.R
+import com.turelo.itunesbrowsersample.base.fragment.DataBoundAbstractFragment
+import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
+import com.turelo.itunesbrowsersample.databinding.DetailsFragmentBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class DetailsFragment : Fragment() {
+class DetailsFragment : DataBoundAbstractFragment<DetailsFragmentBinding>() {
 
-    companion object {
-        fun newInstance() = DetailsFragment()
-    }
+    override val layoutResourceId: Int
+        get() = R.layout.details_fragment
 
-    private lateinit var viewModel: DetailsViewModel
+    private val viewModel by viewModel<DetailsViewModel>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.details_fragment, container, false)
-    }
+    override fun viewModel(): BaseViewModel = viewModel
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(DetailsViewModel::class.java)
-        // TODO: Use the ViewModel
+        requireNotNull(viewModel)
     }
 
 }
