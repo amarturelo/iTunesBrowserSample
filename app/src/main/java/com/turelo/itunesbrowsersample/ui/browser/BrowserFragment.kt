@@ -1,32 +1,30 @@
 package com.turelo.itunesbrowsersample.ui.browser
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import com.turelo.itunesbrowsersample.R
+import com.turelo.itunesbrowsersample.base.fragment.DataBoundAbstractFragment
+import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
+import com.turelo.itunesbrowsersample.databinding.BrowserFragmentBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class BrowserFragment : Fragment() {
+class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>() {
 
-    companion object {
-        fun newInstance() = BrowserFragment()
-    }
+    override fun viewModel(): BaseViewModel = viewModel
 
-    private lateinit var viewModel: BrowserViewModel
+    private val viewModel by viewModel<BrowserViewModel>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.browser_fragment, container, false)
+    override val layoutResourceId: Int = R.layout.browser_fragment
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        tag.d("onViewCreated")
+        binding.viewModel = viewModel
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(BrowserViewModel::class.java)
-        // TODO: Use the ViewModel
+        requireNotNull(viewModel)
     }
 
 }

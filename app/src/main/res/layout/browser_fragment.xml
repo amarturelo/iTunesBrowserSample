@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.browser.BrowserFragment">
+    tools:context=".ui.features.counters_list.CountersListFragment">
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:text="Browser" />
+
+    </FrameLayout>
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.turelo.itunesbrowsersample.ui.browser.BrowserViewModel" />
+    </data>
+
+</layout>
