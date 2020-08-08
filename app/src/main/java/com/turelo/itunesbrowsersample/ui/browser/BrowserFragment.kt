@@ -3,22 +3,20 @@ package com.turelo.itunesbrowsersample.ui.browser
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.animation.doOnEnd
+import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindToLifecycle
 import com.turelo.itunesbrowsersample.R
 import com.turelo.itunesbrowsersample.base.fragment.DataBoundAbstractFragment
 import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
 import com.turelo.itunesbrowsersample.databinding.BrowserFragmentBinding
 import com.turelo.itunesbrowsersample.extensions.rxFocus
-import com.turelo.itunesbrowsersample.utils.KeyboardManager
 import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.browser_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>() {
 
@@ -28,28 +26,30 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>() {
 
     private val viewModel by viewModel<BrowserViewModel>()
 
-    private lateinit var keyboardManager: KeyboardManager
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tag.d("onViewCreated")
         binding.viewModel = viewModel
-
-        searchView.rxFocus()
-            .flatMap {
-                if (it) {
-                    return@flatMap this.collapse().toObservable<Boolean>()
-                } else {
-                    return@flatMap this.expanded().toObservable<Boolean>()
-                }
-            }
-            .subscribe()
-
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        requireNotNull(viewModel)
+
+        this.setupObservers()
+    }
+
+    private fun setupObservers() {
+        searchView.rxFocus()
+            .flatMapCompletable {
+                return@flatMapCompletable if (it) {
+                    this.collapse()
+                } else {
+                    this.expanded()
+                }
+            }
+            .andThen(io.reactivex.Observable.just(true))
+            .bindToLifecycle(this)
+            .subscribe()
     }
 
     private fun collapse(): Completable = Completable.create { emitter ->
