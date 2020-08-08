@@ -10,11 +10,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>() {
 
+    override val layoutResourceId: Int = R.layout.browser_fragment
+
     override fun viewModel(): BaseViewModel = viewModel
 
     private val viewModel by viewModel<BrowserViewModel>()
-
-    override val layoutResourceId: Int = R.layout.browser_fragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

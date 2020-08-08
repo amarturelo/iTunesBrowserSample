@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.browser.BrowserFragment">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -11,9 +12,17 @@
             android:layout_height="match_parent"
             tools:text="Browser" />
 
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> viewModel.nextAction()}"
+            android:text="@string/text_next" />
+
     </FrameLayout>
 
     <data>
+
         <variable
             name="viewModel"
             type="com.turelo.itunesbrowsersample.ui.browser.BrowserViewModel" />

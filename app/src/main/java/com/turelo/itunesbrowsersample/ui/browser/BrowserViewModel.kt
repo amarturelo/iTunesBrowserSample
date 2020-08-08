@@ -8,4 +8,7 @@ class BrowserViewModel(
     application: Application,
     private val subscribeOnSchedule: Scheduler
 ) : BaseViewModel(application) {
+    fun nextAction() {
+        navigate(BrowserFragmentDirections.actionBrowserFragmentToDetailsFragment())
+    }
 }
