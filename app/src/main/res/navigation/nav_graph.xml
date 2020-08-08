@@ -11,11 +11,26 @@
         tools:layout="@layout/browser_fragment" >
         <action
             android:id="@+id/action_browserFragment_to_detailsFragment"
-            app:destination="@id/detailsFragment" />
+            app:destination="@id/detailsFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit" />
     </fragment>
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.turelo.itunesbrowsersample.ui.details.DetailsFragment"
         android:label="details_fragment"
-        tools:layout="@layout/details_fragment" />
+        tools:layout="@layout/details_fragment" >
+        <argument
+            android:name="artworkUrl100"
+            app:argType="string" />
+        <argument
+            android:name="collectionName"
+            app:argType="string" />
+        <argument
+            android:name="artistName"
+            app:argType="string" />
+        <argument
+            android:name="trackId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

@@ -7,12 +7,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.animation.doOnEnd
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindToLifecycle
+import com.trello.lifecycle2.android.lifecycle.AndroidLifecycle
+import com.trello.rxlifecycle3.LifecycleProvider
+import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindUntilEvent
 import com.turelo.itunesbrowsersample.AppExecutors
 import com.turelo.itunesbrowsersample.R
 import com.turelo.itunesbrowsersample.base.fragment.DataBoundAbstractFragment
@@ -24,16 +30,12 @@ import com.turelo.itunesbrowsersample.ui.browser.BrowserViewModel.Companion.STAT
 import com.turelo.itunesbrowsersample.ui.browser.models.SongItemViewModel
 import com.turelo.itunesbrowsersample.ui.common.CellClickListener
 import io.reactivex.Completable
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.browser_fragment.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
-import org.koin.dsl.module
-import org.koin.androidx.viewmodel.dsl.viewModel
+
 
 class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
     CellClickListener<SongItemViewModel> {
@@ -63,6 +65,9 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
         this.setupRecyclerView()
     }
 
+    private val provider: LifecycleProvider<Lifecycle.Event> =
+        AndroidLifecycle.createLifecycleProvider(this)
+
     private fun setupObservers() {
         searchView.rxFocus()
             .doOnNext {
@@ -80,7 +85,7 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
                 }
             }
             .andThen(io.reactivex.Observable.just(true))
-            .bindToLifecycle(this)
+            .bindUntilEvent<Boolean?>(this, Lifecycle.Event.ON_PAUSE)
             .subscribe()
 
         viewModel.isLoadingLiveData().observe(viewLifecycleOwner, Observer {
@@ -192,6 +197,24 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
 
     override fun onCellClickListener(data: SongItemViewModel, view: View) {
         tag.d("onCellClickListener: $data")
+
+        val extras = FragmentNavigatorExtras(
+            view.findViewById<ImageView>(R.id.artwork) to "artwork${data.trackId}"
+            //view.findViewById<TextView>(R.id.collectionName) to "collectionName${data.trackId}"
+        )
+
+        val action =
+            BrowserFragmentDirections.actionBrowserFragmentToDetailsFragment(
+                collectionName = data.collectionName,
+                artistName = data.artistName,
+                artworkUrl100 = data.artworkUrl100,
+                trackId = data.trackId
+            )
+
+        findNavController().navigate(
+            action,
+            extras
+        )
     }
 
 }

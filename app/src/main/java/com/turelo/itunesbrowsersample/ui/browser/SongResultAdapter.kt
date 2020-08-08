@@ -62,8 +62,8 @@ class SongViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         this.model = model
         model?.also {
 
-            artwork.transitionName = model.artworkUrl100
-            collectionName.transitionName = "${model.artworkUrl100}${model.collectionName}"
+            artwork.transitionName = "artwork${model.trackId}"
+            collectionName.transitionName = "collectionName${model.trackId}"
 
             collectionName.text = it.collectionName
             trackName.text = it.trackName
