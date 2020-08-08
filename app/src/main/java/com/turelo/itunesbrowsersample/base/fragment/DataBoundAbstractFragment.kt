@@ -39,7 +39,7 @@ abstract class DataBoundAbstractFragment<T : ViewDataBinding> : Fragment() {
         tag.d("onActivityCreated")
         viewModel().navigationCommands.observe(viewLifecycleOwner, Observer { command ->
             when (command) {
-                is NavigationCommand.To -> findNavController().navigate(command.directions)
+                is NavigationCommand.To -> findNavController().navigate(command.directions,command.extras)
                 is NavigationCommand.Back -> findNavController().popBackStack()
                 is NavigationCommand.BackTo -> findNavController().popBackStack(
                     command.destinationId,

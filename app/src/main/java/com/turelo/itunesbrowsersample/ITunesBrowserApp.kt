@@ -1,8 +1,7 @@
 package com.turelo.itunesbrowsersample
 
 import android.app.Application
-import com.turelo.itunesbrowsersample.di.appModule
-import com.turelo.itunesbrowsersample.di.viewModelModule
+import com.turelo.itunesbrowsersample.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -30,6 +29,9 @@ class ITunesBrowserApp : Application() {
             modules(
                 listOf(
                     appModule,
+                    providersModule,
+                    dbModule,
+                    repositoriesModule,
                     viewModelModule
                 )
             )
