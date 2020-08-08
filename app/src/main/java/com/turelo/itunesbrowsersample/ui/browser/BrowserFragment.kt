@@ -197,24 +197,7 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
 
     override fun onCellClickListener(data: SongItemViewModel, view: View) {
         tag.d("onCellClickListener: $data")
-
-        val extras = FragmentNavigatorExtras(
-            view.findViewById<ImageView>(R.id.artwork) to "artwork${data.trackId}"
-            //view.findViewById<TextView>(R.id.collectionName) to "collectionName${data.trackId}"
-        )
-
-        val action =
-            BrowserFragmentDirections.actionBrowserFragmentToDetailsFragment(
-                collectionName = data.collectionName,
-                artistName = data.artistName,
-                artworkUrl100 = data.artworkUrl100,
-                trackId = data.trackId
-            )
-
-        findNavController().navigate(
-            action,
-            extras
-        )
+        this.viewModel.itemSelect(data, view)
     }
 
 }

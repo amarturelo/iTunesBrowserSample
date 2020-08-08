@@ -1,14 +1,19 @@
 package com.turelo.itunesbrowsersample.ui.browser
 
 import android.app.Application
+import android.view.View
+import android.widget.ImageView
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.paging.Config
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.turelo.itunesbrowsersample.R
 import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
 import com.turelo.itunesbrowsersample.base.viewmodel.SingleLiveEvent
 import com.turelo.itunesbrowsersample.models.ErrorWithRetryAction
@@ -148,6 +153,26 @@ class BrowserViewModel(
                         )
                     })
         }
+    }
+
+    fun itemSelect(data: SongItemViewModel, view: View) {
+        val extras = FragmentNavigatorExtras(
+            view.findViewById<ImageView>(R.id.artwork) to "artwork${data.trackId}"
+            //view.findViewById<TextView>(R.id.collectionName) to "collectionName${data.trackId}"
+        )
+
+        val action =
+            BrowserFragmentDirections.actionBrowserFragmentToDetailsFragment(
+                collectionName = data.collectionName,
+                artistName = data.artistName,
+                artworkUrl100 = data.artworkUrl100,
+                trackId = data.trackId
+            )
+
+        navigate(
+            action,
+            extras
+        )
     }
 
     /*fun nextAction() {

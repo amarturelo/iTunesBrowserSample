@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavDirections
+import androidx.navigation.fragment.FragmentNavigator
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
@@ -25,12 +26,16 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     open val navigationCommands: LiveData<NavigationCommand>
         get() = _navigationCommands
 
-    fun navigate(directions: NavDirections) {
+    fun navigate(
+        directions: NavDirections,
+        extras: FragmentNavigator.Extras = FragmentNavigator.Extras.Builder().build()
+    ) {
         tag.d(directions.toString())
 
         _navigationCommands.postValue(
             NavigationCommand.To(
-                directions
+                directions,
+                extras
             )
         )
     }
