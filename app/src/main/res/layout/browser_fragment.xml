@@ -46,14 +46,35 @@
 
         </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="0dp"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_below="@id/app_bar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/app_bar"
-            tools:listitem="@layout/song_recycler_view_item" />
+            app:onRefreshListener="@{() -> viewModel.refresh()}">
+
+            <com.turelo.itunesbrowsersample.ui.common.StatefulLayout
+                android:id="@+id/statefulLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:state="@{viewModel.state}">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/searchRV"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    tools:itemCount="30"
+                    tools:listitem="@layout/song_recycler_view_item" />
+            </com.turelo.itunesbrowsersample.ui.common.StatefulLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data>
