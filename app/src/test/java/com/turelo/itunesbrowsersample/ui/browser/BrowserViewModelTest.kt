@@ -128,7 +128,7 @@ class BrowserViewModelTest : AbstractViewModelTest() {
 
         viewModel.search("as")
 
-        viewModel.isLoadingLiveData().getOrAwaitValue()
+        //viewModel.isLoadingLiveData().getOrAwaitValue()
         viewModel.errorLiveData().getOrAwaitValue()
 
         assertEquals(observerError.capture.size, 1)

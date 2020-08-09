@@ -96,7 +96,7 @@ class BrowserViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 this.tag.d("Search complete")
-
+                this.isLoadingMutableLiveData.postValue(false)
                 this.state.set(
                     if (!it.next && it.page == 1) {
                         STATE_EMPTY_RESULT
@@ -106,9 +106,9 @@ class BrowserViewModel(
                 )
 
                 this.pagingStatus = it
-                this.isLoadingMutableLiveData.postValue(false)
             }, {
                 this.tag.e(it)
+                this.isLoadingMutableLiveData.postValue(false)
                 this.errorMutableLiveData.postValue(
                     ErrorWithRetryAction(
                         exception = it as Exception,
@@ -116,7 +116,6 @@ class BrowserViewModel(
                             this.populate(term)
                         })
                 )
-                this.isLoadingMutableLiveData.postValue(false)
             })
             .addTo(compositeDisposable)
     }
