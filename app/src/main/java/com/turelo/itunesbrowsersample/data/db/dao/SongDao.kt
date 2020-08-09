@@ -17,4 +17,7 @@ interface SongDao {
 
     @Query("DELETE FROM songs")
     fun clearAll(): Int
+
+    @Query("SELECT * FROM songs")
+    fun getAll(): List<Song>
 }
