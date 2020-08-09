@@ -11,14 +11,13 @@ import com.turelo.itunesbrowsersample.models.ErrorWithRetryAction
 import com.turelo.itunesbrowsersample.models.Song
 import com.turelo.itunesbrowsersample.repositories.ITunesRepository
 import com.turelo.itunesbrowsersample.repositories.impl.ITunesRepositoryImpl
-import com.turelo.itunesbrowsersample.ui.common.CaptureObserver
+import com.turelo.itunesbrowsersample.common.CaptureObserver
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -95,7 +94,8 @@ class BrowserViewModelTest : AbstractViewModelTest() {
 
         assertNull(viewModel.isLoadingLiveData().value)
 
-        val observerIsLoading = CaptureObserver<Boolean>()
+        val observerIsLoading =
+            CaptureObserver<Boolean>()
 
         viewModel.isLoadingLiveData().observeForever(observerIsLoading)
 
@@ -118,8 +118,10 @@ class BrowserViewModelTest : AbstractViewModelTest() {
             )
         ).thenReturn(Single.error<SearchResponse>(Exception()))
 
-        val observerIsLoading = CaptureObserver<Boolean>()
-        val observerError = CaptureObserver<ErrorWithRetryAction>()
+        val observerIsLoading =
+            CaptureObserver<Boolean>()
+        val observerError =
+            CaptureObserver<ErrorWithRetryAction>()
 
         viewModel.isLoadingLiveData().observeForever(observerIsLoading)
         viewModel.errorLiveData().observeForever(observerError)
@@ -168,7 +170,8 @@ class BrowserViewModelTest : AbstractViewModelTest() {
 
         assertNull(viewModel.isLoadingLiveData().value)
 
-        val observerIsLoading = CaptureObserver<Boolean>()
+        val observerIsLoading =
+            CaptureObserver<Boolean>()
 
         viewModel.isLoadingLiveData().observe(lifecycleOwner, observerIsLoading)
 

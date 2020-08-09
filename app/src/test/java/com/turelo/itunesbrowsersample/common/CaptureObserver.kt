@@ -1,4 +1,4 @@
-package com.turelo.itunesbrowsersample.ui.common
+package com.turelo.itunesbrowsersample.common
 
 import androidx.lifecycle.Observer
 
