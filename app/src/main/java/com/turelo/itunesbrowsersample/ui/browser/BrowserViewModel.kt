@@ -59,14 +59,6 @@ class BrowserViewModel(
     fun errorLiveData(): LiveData<ErrorWithRetryAction> = errorMutableLiveData
 
     private val searchMutableLiveData = MutableLiveData<String>()
-    /*private val searchTextLiveData = LiveDataReactiveStreams.fromPublisher<String>(
-        searchSubject.toFlowable(BackpressureStrategy.BUFFER)
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .doOnNext {
-                this.isLoadingMutableLiveData.postValue(true)
-                this.populate(it)
-            }
-    )*/
 
     val songListLiveData: LiveData<PagedList<SongItemViewModel>> =
         this.searchMutableLiveData.switchMap { term ->
