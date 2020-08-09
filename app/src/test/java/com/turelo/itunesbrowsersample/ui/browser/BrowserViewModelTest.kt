@@ -1,10 +1,15 @@
 package com.turelo.itunesbrowsersample.ui.browser
 
 import androidx.room.Room
+import com.trello.rxlifecycle3.LifecycleProvider
 import com.turelo.itunesbrowsersample.common.AbstractViewModelTest
 import com.turelo.itunesbrowsersample.data.db.ITunesDatabase
+import com.turelo.itunesbrowsersample.data.providers.ITunesProvider
+import com.turelo.itunesbrowsersample.data.providers.response.SearchResponse
 import com.turelo.itunesbrowsersample.models.Song
 import com.turelo.itunesbrowsersample.repositories.ITunesRepository
+import com.turelo.itunesbrowsersample.repositories.impl.ITunesRepositoryImpl
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -14,25 +19,32 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.Mockito.any
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.*
 
 
 class BrowserViewModelTest : AbstractViewModelTest() {
 
-    lateinit var viewModel: BrowserViewModel
-    lateinit var iTunesRepository: ITunesRepository
+    private lateinit var viewModel: BrowserViewModel
+    private lateinit var iTunesRepository: ITunesRepository
     private lateinit var iTunesDatabase: ITunesDatabase
+    private lateinit var iTunesProvider: ITunesProvider
 
     @Before
     fun setUp() {
-        iTunesDatabase = Room.inMemoryDatabaseBuilder(
+
+        this.iTunesProvider = mock(ITunesProvider::class.java)
+
+        this.iTunesDatabase = Room.inMemoryDatabaseBuilder(
             context,
             ITunesDatabase::class.java
         ).build()
 
-        iTunesRepository = mock(ITunesRepository::class.java)
-        viewModel = BrowserViewModel(
+        this.iTunesRepository = ITunesRepositoryImpl(
+            songDao = this.iTunesDatabase.songDao(),
+            iTunesProvider = this.iTunesProvider
+        )
+
+        this.viewModel = BrowserViewModel(
             iTunesRepository = iTunesRepository,
             application = context,
             subscribeOnSchedule = Schedulers.trampoline()
@@ -47,33 +59,40 @@ class BrowserViewModelTest : AbstractViewModelTest() {
     @Test
     fun notNullViewModel() {
         assertNotNull(viewModel)
-
-
     }
 
     @Test
-    fun testLo() {
-        iTunesDatabase.songDao().insertAll(
-            listOf(
-                Song(
-                    trackId = 12,
-                    collectionName = "as",
-                    artistName = "as",
-                    artworkUrl100 = "as",
-                    trackPrice = 12.0,
-                    trackName = "as"
-                )
+    fun cacheSearch_WhenSuccessProvider() {
+        val mockData = listOf(
+            Song(
+                trackId = 1,
+                collectionName = "as",
+                artistName = "as",
+                artworkUrl100 = "as",
+                trackPrice = 12.0,
+                trackName = "as"
+            ),
+            Song(
+                trackId = 2,
+                collectionName = "as2",
+                artistName = "as2",
+                artworkUrl100 = "as2",
+                trackPrice = 12.0,
+                trackName = "as2"
             )
         )
 
-        /*Mockito.`when`(this.iTunesRepository.search(ArgumentMatchers.anyString())).thenAnswer {
-            return@thenAnswer iTunesDatabase.songDao().pagingSource(it.getArgument(0))
-        }
+        `when`(
+            iTunesProvider.search(
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(),
+                ArgumentMatchers.anyInt()
+            )
+        ).thenReturn(Single.just(SearchResponse(2, mockData)))
 
-        viewModel.search("as")*/
+        viewModel.search("as")
 
         val songs = iTunesDatabase.songDao().getAll()
-        assertEquals(songs.size, 1)
+        assertEquals(songs.size, 2)
     }
 
 }

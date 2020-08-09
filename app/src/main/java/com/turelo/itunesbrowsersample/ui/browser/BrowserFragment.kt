@@ -16,6 +16,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.trello.lifecycle2.android.lifecycle.AndroidLifecycle
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindUntilEvent
@@ -65,9 +66,6 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
         this.setupRecyclerView()
     }
 
-    private val provider: LifecycleProvider<Lifecycle.Event> =
-        AndroidLifecycle.createLifecycleProvider(this)
-
     private fun setupObservers() {
         searchView.rxFocus()
             .doOnNext {
@@ -94,6 +92,15 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
 
         viewModel.songListLiveData.observe(viewLifecycleOwner, Observer {
             this.adapter.submitList(it)
+        })
+
+        viewModel.errorLiveData().observe(viewLifecycleOwner, Observer { retryAction ->
+            view?.let { v ->
+                Snackbar.make(v, "Something went terribly wrong", Snackbar.LENGTH_LONG)
+                    .setAction("Try again") {
+                        retryAction.retry.invoke()
+                    }.show()
+            }
         })
     }
 
