@@ -34,8 +34,9 @@ abstract class DataBoundAbstractFragment<T : ViewDataBinding> : Fragment() {
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         tag.d("onActivityCreated")
         viewModel().navigationCommands.observe(viewLifecycleOwner, Observer { command ->
             when (command) {

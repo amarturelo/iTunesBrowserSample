@@ -58,18 +58,10 @@ class BrowserViewModel(
     private val errorMutableLiveData = SingleLiveEvent<ErrorWithRetryAction>()
     fun errorLiveData(): LiveData<ErrorWithRetryAction> = errorMutableLiveData
 
-    private val searchSubject: PublishSubject<String> = PublishSubject.create()
-    private val searchTextLiveData = LiveDataReactiveStreams.fromPublisher<String>(
-        searchSubject.toFlowable(BackpressureStrategy.BUFFER)
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .doOnNext {
-                this.isLoadingMutableLiveData.postValue(true)
-                this.populate(it)
-            }
-    )
+    private val searchMutableLiveData = SingleLiveEvent<String>()
 
     val songListLiveData: LiveData<PagedList<SongItemViewModel>> =
-        this.searchTextLiveData.switchMap { term ->
+        this.searchMutableLiveData.switchMap { term ->
             return@switchMap iTunesRepository.search(term).map {
                 return@map SongItemViewModel(
                     trackId = it.trackId,
@@ -87,11 +79,15 @@ class BrowserViewModel(
 
     fun search(text: String) {
         this.tag.d("Search: $text")
-        searchSubject.onNext(text)
+        if (text != searchMutableLiveData.value) {
+            searchMutableLiveData.value = text
+            this.isLoadingMutableLiveData.postValue(true)
+            this.populate(text)
+        }
     }
 
     fun refresh() {
-        this.populate(searchTextLiveData.value ?: "")
+        this.populate(searchMutableLiveData.value ?: "")
     }
 
     private fun populate(term: String) {
@@ -102,7 +98,7 @@ class BrowserViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 this.tag.d("Search complete")
-
+                this.isLoadingMutableLiveData.postValue(false)
                 this.state.set(
                     if (!it.next && it.page == 1) {
                         STATE_EMPTY_RESULT
@@ -112,9 +108,9 @@ class BrowserViewModel(
                 )
 
                 this.pagingStatus = it
-                this.isLoadingMutableLiveData.postValue(false)
             }, {
                 this.tag.e(it)
+                this.isLoadingMutableLiveData.postValue(false)
                 this.errorMutableLiveData.postValue(
                     ErrorWithRetryAction(
                         exception = it as Exception,
@@ -122,7 +118,6 @@ class BrowserViewModel(
                             this.populate(term)
                         })
                 )
-                this.isLoadingMutableLiveData.postValue(false)
             })
             .addTo(compositeDisposable)
     }
@@ -131,7 +126,7 @@ class BrowserViewModel(
         if ((this.loadMoreDisposable == null || this.loadMoreDisposable!!.isDisposed) && this.pagingStatus != null) {
             this.loadMoreDisposable =
                 this.iTunesRepository.search(
-                    searchTextLiveData.value ?: "",
+                    searchMutableLiveData.value ?: "",
                     pagingStatus = this.pagingStatus!!
                 )
                     .subscribeOn(subscribeOnSchedule)

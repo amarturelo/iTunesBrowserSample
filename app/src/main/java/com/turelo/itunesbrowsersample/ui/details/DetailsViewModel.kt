@@ -7,8 +7,7 @@ import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
 import io.reactivex.Scheduler
 
 class DetailsViewModel(
-    application: Application,
-    private val subscribeOnSchedule: Scheduler
+    application: Application
 ) : BaseViewModel(application) {
     private lateinit var arg: DetailsFragmentArgs
 

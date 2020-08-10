@@ -18,7 +18,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
         setContentView(layoutResId)
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        //window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 
         tag.d("onCreate")
     }

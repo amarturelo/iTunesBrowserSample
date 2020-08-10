@@ -3,6 +3,7 @@ package com.turelo.itunesbrowsersample.ui.browser
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.trello.lifecycle2.android.lifecycle.AndroidLifecycle
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindUntilEvent
@@ -25,6 +27,7 @@ import com.turelo.itunesbrowsersample.base.fragment.DataBoundAbstractFragment
 import com.turelo.itunesbrowsersample.base.viewmodel.BaseViewModel
 import com.turelo.itunesbrowsersample.databinding.BrowserFragmentBinding
 import com.turelo.itunesbrowsersample.extensions.rxFocus
+import com.turelo.itunesbrowsersample.extensions.rxQuery
 import com.turelo.itunesbrowsersample.extensions.setDivider
 import com.turelo.itunesbrowsersample.ui.browser.BrowserViewModel.Companion.STATE_EMPTY_RESULT
 import com.turelo.itunesbrowsersample.ui.browser.models.SongItemViewModel
@@ -48,25 +51,16 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
 
     private val viewModel by viewModel<BrowserViewModel>()
 
-    private val executors: AppExecutors by inject()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tag.d("onViewCreated")
         binding.viewModel = viewModel
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
 
         this.setupObservers()
         this.setupStatefulLayout()
         this.setupSearchView()
         this.setupRecyclerView()
     }
-
-    private val provider: LifecycleProvider<Lifecycle.Event> =
-        AndroidLifecycle.createLifecycleProvider(this)
 
     private fun setupObservers() {
         searchView.rxFocus()
@@ -75,7 +69,6 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
             }
             .debounce(100, TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
-            .subscribeOn(mainThread())
             .observeOn(mainThread())
             .flatMapCompletable {
                 return@flatMapCompletable if (it) {
@@ -95,19 +88,27 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
         viewModel.songListLiveData.observe(viewLifecycleOwner, Observer {
             this.adapter.submitList(it)
         })
+
+        viewModel.errorLiveData().observe(viewLifecycleOwner, Observer { retryAction ->
+            view?.let { v ->
+                Snackbar.make(v, "Something went terribly wrong", Snackbar.LENGTH_LONG)
+                    .setAction("Try again") {
+                        retryAction.retry.invoke()
+                    }.show()
+            }
+        })
     }
 
+    @SuppressLint("CheckResult")
     private fun setupSearchView() {
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = true
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                this@BrowserFragment.viewModel.search(newText ?: "")
-                return true
+        searchView.rxQuery()
+            .distinctUntilChanged()
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .bindUntilEvent(this, Lifecycle.Event.ON_PAUSE)
+            .observeOn(mainThread())
+            .subscribe {
+                viewModel.search(it)
             }
-
-        })
     }
 
     private fun setupRecyclerView() {
@@ -132,6 +133,7 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
 
     }
 
+    @SuppressLint("InflateParams")
     private fun setupStatefulLayout() {
         statefulLayout.setStateView(
             STATE_EMPTY_RESULT,

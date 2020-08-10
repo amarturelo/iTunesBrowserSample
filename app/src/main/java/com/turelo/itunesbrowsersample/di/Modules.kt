@@ -2,6 +2,7 @@ package com.turelo.itunesbrowsersample.di
 
 import androidx.room.Room
 import com.turelo.itunesbrowsersample.AppExecutors
+import com.turelo.itunesbrowsersample.Player
 import com.turelo.itunesbrowsersample.data.db.ITunesDatabase
 import com.turelo.itunesbrowsersample.data.providers.ITunesProvider
 import com.turelo.itunesbrowsersample.data.providers.impl.ITunesProviderImpl
@@ -23,8 +24,7 @@ val viewModelModule = module {
     }
     viewModel {
         DetailsViewModel(
-            application = get(),
-            subscribeOnSchedule = Schedulers.from(get<AppExecutors>().networkIO())
+            application = get()
         )
     }
 }
@@ -56,5 +56,8 @@ val dbModule = module {
 val appModule = module {
     single {
         AppExecutors()
+    }
+    factory {
+        Player()
     }
 }
