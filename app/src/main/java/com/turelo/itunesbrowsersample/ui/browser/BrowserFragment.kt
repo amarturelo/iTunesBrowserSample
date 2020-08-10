@@ -103,7 +103,7 @@ class BrowserFragment : DataBoundAbstractFragment<BrowserFragmentBinding>(),
     private fun setupSearchView() {
         searchView.rxQuery()
             .distinctUntilChanged()
-            .debounce(100, TimeUnit.MILLISECONDS)
+            .debounce(500, TimeUnit.MILLISECONDS)
             .bindUntilEvent(this, Lifecycle.Event.ON_PAUSE)
             .observeOn(mainThread())
             .subscribe {
