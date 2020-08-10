@@ -58,7 +58,7 @@ class BrowserViewModel(
     private val errorMutableLiveData = SingleLiveEvent<ErrorWithRetryAction>()
     fun errorLiveData(): LiveData<ErrorWithRetryAction> = errorMutableLiveData
 
-    private val searchMutableLiveData = MutableLiveData<String>()
+    private val searchMutableLiveData = SingleLiveEvent<String>()
 
     val songListLiveData: LiveData<PagedList<SongItemViewModel>> =
         this.searchMutableLiveData.switchMap { term ->
@@ -79,9 +79,11 @@ class BrowserViewModel(
 
     fun search(text: String) {
         this.tag.d("Search: $text")
-        searchMutableLiveData.value = text
-        this.isLoadingMutableLiveData.postValue(true)
-        this.populate(text)
+        if (text != searchMutableLiveData.value) {
+            searchMutableLiveData.value = text
+            this.isLoadingMutableLiveData.postValue(true)
+            this.populate(text)
+        }
     }
 
     fun refresh() {
