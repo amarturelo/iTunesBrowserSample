@@ -23,8 +23,7 @@ val viewModelModule = module {
     }
     viewModel {
         DetailsViewModel(
-            application = get(),
-            subscribeOnSchedule = Schedulers.from(get<AppExecutors>().networkIO())
+            application = get()
         )
     }
 }
